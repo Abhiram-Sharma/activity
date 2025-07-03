@@ -1,0 +1,32 @@
+name: Automated Commits (10AM & 10PM IST)
+
+on:
+  schedule:
+    # 4:30 and 16:30 UTC = 10:00 and 22:00 IST
+    - cron: '30 4,16 * * *'
+  workflow_dispatch:  # optional: lets you run it manually from UI
+
+jobs:
+  commit-bot:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Make 5 Dummy Commits
+        run: |
+          for i in {1..5}
+          do
+            echo "Commit $i at $(date -u)" >> commits.log
+            git add commits.log
+            git commit -m "🤖 Auto-commit $i on $(date -u)"
+          done
+
+      - name: Push Changes
+        run: git push
