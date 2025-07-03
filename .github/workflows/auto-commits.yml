@@ -1,35 +1,28 @@
-name: Automated Commits (10AM & 10PM IST)
+name: Auto Push to Main
 
 on:
-  schedule:
-    - cron: '30 4,16 * * *'  # 10AM & 10PM IST
-  workflow_dispatch:
+  workflow_dispatch: # manual trigger (you can also add push/pull_request as needed)
 
 jobs:
-  commit-bot:
+  push:
     runs-on: ubuntu-latest
 
+    env:
+      TOKEN: ${{ secrets.MY_PAT }}
+
     steps:
-      - name: Checkout Repo
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Configure Git
+      - name: Set up Git user
         run: |
-          git config user.name "Abhiram-Sharma"
-          git config user.email "ab23.ar39@gmail.com"
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
 
-      - name: Make 5 Dummy Commits
-        run: |
-          for i in {1..5}
-          do
-            echo "Commit $i at $(date -u)" >> commits.log
-            git add commits.log
-            git commit -m "🤖 Auto-commit $i on $(date -u)" || echo "No changes to commit"
-          done
-
-      - name: Push Changes Using PAT
-        env:
-          TOKEN: ${{ secrets.PAT }}
+      - name: Set remote with PAT
         run: |
           git remote set-url origin https://x-access-token:${TOKEN}@github.com/Abhiram-Sharma/activity.git
+
+      - name: Push to main
+        run: |
           git push origin main
